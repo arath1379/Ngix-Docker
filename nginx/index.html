@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos de la Base</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h2>Datos de la Base de Datos</h2>
+    <button onclick="cargarDatos()">Cargar Datos</button>
+    <table id="tablaDatos">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Correo</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Aquí se insertarán los datos dinámicamente -->
+        </tbody>
+    </table>
+
+    <script>
+        function cargarDatos() {
+            fetch('/datos')
+                .then(response => response.json())
+                .then(data => {
+                    const tabla = document.getElementById('tablaDatos').getElementsByTagName('tbody')[0];
+                    tabla.innerHTML = ""; // Limpia la tabla antes de actualizar
+
+                    data.forEach(row => {
+                        let newRow = tabla.insertRow();
+                        newRow.insertCell().textContent = row.id;
+                        newRow.insertCell().textContent = row.nombre;
+                        newRow.insertCell().textContent = row.correo;
+                    });
+                })
+                .catch(error => console.error('Error al cargar datos:', error));
+        }
+    </script>
+</body>
+</html>
