@@ -7,7 +7,7 @@ const PORT = 3000;
 
 // Configurar conexión a MySQL
 const db = mysql.createConnection({
-    host: 'mysql',  // Nombre del servicio MySQL en Docker
+    host: 'localhost',  // Asegúrate de que 'localhost' es correcto en Docker
     user: 'root',
     password: 'root',
     database: 'mi_base_de_datos'
@@ -24,32 +24,27 @@ db.connect((err) => {
     }
 });
 
-// Servir el HTML
+// 🔹 Hacer pública la carpeta 'nginx'
+app.use(express.static(path.join(__dirname, 'nginx')));
+
+// 🔹 Servir index.html correctamente
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, '..', 'nginx', 'index.html'));
 });
 
-// Nueva ruta para obtener datos desde MySQL
+// 🔹 Nueva ruta para obtener datos desde MySQL
 app.get('/datos', (req, res) => {
-    db.ping((err) => {
+    db.query('SELECT id, nombre, email FROM usuarios', (err, results) => {
         if (err) {
-            console.error('Error con la conexión a la BD:', err);
-            res.status(500).send('Error de conexión a la base de datos');
+            console.error('Error en la consulta:', err);
+            res.status(500).send('Error en la base de datos');
             return;
         }
-
-        db.query('SELECT id, nombre, email FROM usuarios', (err, results) => {
-            if (err) {
-                console.error('Error en la consulta:', err);
-                res.status(500).send('Error en la base de datos');
-                return;
-            }
-            res.json(results);
-        });
+        res.json(results);
     });
 });
 
-// Iniciar servidor
+// 🔹 Iniciar servidor
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
