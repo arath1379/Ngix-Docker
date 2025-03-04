@@ -5,12 +5,12 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
-// Configurar conexión a MySQL
+// Usar host de la variable de entorno MYSQL_HOST (host.docker.internal)
 const db = mysql.createConnection({
-    host: 'localhost',  // Asegúrate de que 'localhost' es correcto en Docker
-    user: 'root',
-    password: 'root',
-    database: 'mi_base_de_datos'
+    host: process.env.MYSQL_HOST,  // Se toma el valor de MYSQL_HOST
+    user: process.env.MYSQL_USER,  // Se toma el valor de MYSQL_USER
+    password: process.env.MYSQL_PASSWORD,  // Se toma el valor de MYSQL_PASSWORD
+    database: process.env.MYSQL_DATABASE  // Se toma el valor de MYSQL_DATABASE
 });
 
 console.log("Intentando conectar a la base de datos...");
@@ -24,15 +24,15 @@ db.connect((err) => {
     }
 });
 
-// 🔹 Hacer pública la carpeta 'nginx'
+// Hacer pública la carpeta 'nginx'
 app.use(express.static(path.join(__dirname, 'nginx')));
 
-// 🔹 Servir index.html correctamente
+// Servir index.html correctamente
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'nginx', 'index.html'));
 });
 
-// 🔹 Nueva ruta para obtener datos desde MySQL
+// Nueva ruta para obtener datos desde MySQL
 app.get('/datos', (req, res) => {
     db.query('SELECT id, nombre, email FROM usuarios', (err, results) => {
         if (err) {
@@ -44,7 +44,7 @@ app.get('/datos', (req, res) => {
     });
 });
 
-// 🔹 Iniciar servidor
+// Iniciar servidor
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
